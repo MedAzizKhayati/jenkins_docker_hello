@@ -13,36 +13,24 @@ pipeline{
         stage("Build"){
             steps{
                 echo "========BUILDING========"
-                docker.build("medazizkhayati/jenkins_docker_hello${BUILD_NUMBER}")
+                sh 'docker build -t medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER} .'
             }
         }
         stage("Test"){
             steps{
                 echo "========TESTING========"
-                sh 'python3 main.py'
+                sh ```
+                python3 main.py
+                ```
             }
         }
-        stage("Login & Push to DockerHub"){
+        stage("Push"){
             steps{
-                echo "========LOGIN TO DOCKERHUB========"
-                withDockerRegistry([credentialsId: "docker_hub_credentials", url: "https://index.docker.io/v1/"]){
-                    echo "========PUSHING TO DOCKERHUB========"
-                    docker.withRegistry( '', "${DOCKERHUB_CREDENTIALS}"){
-                        docker.image("medazizkhayati/jenkins_docker_hello${BUILD_NUMBER}").push()
-                    }
-                }
+                echo "========PUSHING========"
+                sh 'docker login -u ${DOCKERHUB_CREDENTIALS_USR} -p ${DOCKERHUB_CREDENTIALS_PSW}'
+                sh 'docker push medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER}'
             }
         }
-    }
-    post{
-        always{
-            echo "========always========"
-        }
-        success{
-            echo "========pipeline executed successfully ========"
-        }
-        failure{
-            echo "========pipeline execution failed========"
-        }
+
     }
 }
