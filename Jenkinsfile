@@ -13,7 +13,7 @@ pipeline{
         stage("Build"){
             steps{
                 echo "========BUILDING========"
-                sh 'docker build -t medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER} .'
+                docker.build("medazizkhayati/jenkins_docker_hello${BUILD_NUMBER}")
             }
         }
         stage("Test"){
@@ -22,19 +22,17 @@ pipeline{
                 sh 'python3 main.py'
             }
         }
-        stage("Login to DockerHub"){
+        stage("Login & Push to DockerHub"){
             steps{
                 echo "========LOGIN TO DOCKERHUB========"
-                sh 'echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin'
+                withDockerRegistry([credentialsId: "docker_hub_credentials", url: "https://index.docker.io/v1/"]){
+                    echo "========PUSHING TO DOCKERHUB========"
+                    docker.withRegistry( '', "${DOCKERHUB_CREDENTIALS}"){
+                        docker.image("medazizkhayati/jenkins_docker_hello${BUILD_NUMBER}").push()
+                    }
+                }
             }
         }
-        stage("Push to DockerHub"){
-            steps{
-                echo "========PUSHING TO DOCKERHUB========"
-                sh 'docker push medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER}'
-            }
-        }
-
     }
     post{
         always{
