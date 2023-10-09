@@ -4,12 +4,6 @@ pipeline{
         DOCKERHUB_CREDENTIALS = credentials('docker_hub_credentials')
     }
     stages{
-        stage("SCM Checkout"){
-            steps{
-                echo "========SCM CHECKOUT========"
-                git 'https://github.com/MedAzizKhayati/jenkins_docker_hello'
-            }
-        }
         stage("Build"){
             steps{
                 echo "========BUILDING========"
