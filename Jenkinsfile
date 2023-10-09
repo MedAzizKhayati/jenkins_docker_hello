@@ -19,9 +19,9 @@ pipeline{
         stage("Test"){
             steps{
                 echo "========TESTING========"
-                sh ```
+                sh '''
                 python3 main.py
-                ```
+                '''
             }
         }
         stage("Push"){
