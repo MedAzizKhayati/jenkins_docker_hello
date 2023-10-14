@@ -10,13 +10,15 @@ pipeline{
         stage("Test"){
             steps{
                 echo "========TESTING========"
-                sh 'docker run medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER}'
+                sh 'docker run --name test medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER}'
+                sh 'docker rm test'
             }
         }
         stage("Push"){
             steps{
                 echo "========PUSHING========"
                 sh 'docker push medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER}'
+                sh 'docker rmi medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER}'
             }
         }
 
