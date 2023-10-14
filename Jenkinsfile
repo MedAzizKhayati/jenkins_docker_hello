@@ -1,5 +1,8 @@
 pipeline{
     agent any
+    environment{
+        DOCKERHUB_CREDENTIALS = credentials('docker_hub_credentials')
+    }
     stages{
         stage("Build"){
             steps{
@@ -17,6 +20,9 @@ pipeline{
         stage("Push"){
             steps{
                 echo "========PUSHING========"
+                withCredentials([usernamePassword(credentialsId: 'docker_hub_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}'
+                }
                 sh 'docker push medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER}'
                 sh 'docker rmi medazizkhayati/jenkins_docker_hello:${BUILD_NUMBER}'
             }
